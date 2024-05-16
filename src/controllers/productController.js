@@ -74,7 +74,7 @@ export const createProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
 
     try {
-        const products = await Products.find();
+        const products = await Products.find({deletedAt: {$in: [null, undefined]}});
         res.json({
             ok: true,
             products
@@ -98,6 +98,105 @@ export const getProductById = async (req, res) => {
         })
     } catch (error) {
         console.log('Ha habido un error al obtener el producto')
+        res.status(500).json({
+            ok: false,
+            msg: 'Ha habido un error con el servidor'
+        })
+    }
+}
+
+export const editProductById = async (req, res) => {
+    const {id} = req.params;
+    const {body, file} = req;
+    console.log(body)
+    try {
+        const product = await Products.findById(id)
+        if(!product || product.deletedAt) {
+            return res.status(404)
+                      .json({
+                        ok: false,
+                        msg: 'El producto no se ha encontrado o el id es inválido'
+                      })  
+        }
+
+        let imageUrl = product.image
+        console.log(imageUrl)
+
+        if(file) {
+            const imageBuffer = fs.readFileSync(`./temp/imgs/${file.filename}`)
+            const image = await Images.create({
+                fileName: file.filename,
+                image: {
+                    data: imageBuffer,
+                    contentType: "image/png"
+                }
+            })
+        
+            if(!image) {
+                return res.status(400)
+                        .json({
+                            ok: false,
+                            msg: 'No se pudo crear correctamente la imagen'
+                        })  
+            }
+
+            
+            fs.rm(`./temp/imgs/${file.filename}`, error => {
+                if(error) {
+                    console.log('No se ha podido eliminar el archivo')
+                } else {
+                    console.log('El archivo se ha eliminado correctamente')
+                }
+            })
+
+            imageUrl = `${process.env.BASE_URL}/images/${image._id}`
+            
+        }
+
+        const updatedProduct = await Products.findByIdAndUpdate(id, {
+            ...body,
+            image: imageUrl
+        }, {new: true})
+
+        console.log('llegamos hasta aqui')
+        res.json({
+            ok:true,
+            product: updatedProduct,
+            msg: 'El producto se ha editado con éxito'
+        })
+        console.log('llegamos hasta aqui tambien')
+
+    } catch (error) {
+        console.log('Ha habido un error al editar el producto')
+        console.log(error)
+        res.status(500).json({
+            ok: false,
+            msg: 'Ha habido un error con el servidor'
+        })
+    }
+}
+
+export const deleteProductById = async (req, res) => {
+    const {id} = req.params
+    try {
+        const product = await Products.findById(id);
+        if(!product  || product.deletedAt) {
+            return res.status(404)
+                      .json({
+                        ok: false,
+                        msg: 'El producto no fue encontrado'
+                      })  
+        }
+
+        await Products.findByIdAndUpdate(id, {deletedAt: new Date()}, {new: true})
+
+        res.json({
+            ok: true,
+            msg: 'El producto fue eliminado correctamente'
+        })
+    } catch (error) {
+        console.log('Ha habido un error al editar el producto')
+        console.log(error)
         res.status(500).json({
             ok: false,
             msg: 'Ha habido un error con el servidor'
