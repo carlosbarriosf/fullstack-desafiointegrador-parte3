@@ -6,8 +6,6 @@ import { Images } from "../models/Images.js"
 export const createProduct = async (req, res) => {
     const { body, file } = req
     try {
-        console.log(file)
-        console.log(body)
         if(!file) {
             return res.status(400)
             .json({
@@ -62,7 +60,6 @@ export const createProduct = async (req, res) => {
 
     } catch (error) {
         console.log('Ha habido un error al crear el producto')
-        console.log(error)
         res.status(500).json({
             ok: false,
             msg: 'Ha habido un error con el servidor',
@@ -108,7 +105,6 @@ export const getProductById = async (req, res) => {
 export const editProductById = async (req, res) => {
     const {id} = req.params;
     const {body, file} = req;
-    console.log(body)
     try {
         const product = await Products.findById(id)
         if(!product || product.deletedAt) {
@@ -120,7 +116,6 @@ export const editProductById = async (req, res) => {
         }
 
         let imageUrl = product.image
-        console.log(imageUrl)
 
         if(file) {
             const imageBuffer = fs.readFileSync(`./temp/imgs/${file.filename}`)
@@ -168,7 +163,6 @@ export const editProductById = async (req, res) => {
 
     } catch (error) {
         console.log('Ha habido un error al editar el producto')
-        console.log(error)
         res.status(500).json({
             ok: false,
             msg: 'Ha habido un error con el servidor'
@@ -196,7 +190,6 @@ export const deleteProductById = async (req, res) => {
         })
     } catch (error) {
         console.log('Ha habido un error al editar el producto')
-        console.log(error)
         res.status(500).json({
             ok: false,
             msg: 'Ha habido un error con el servidor'
