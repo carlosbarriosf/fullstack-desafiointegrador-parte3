@@ -6,13 +6,6 @@ export const createCart = async (req, res) => {
     const {body} = req;
     try {
         const newCart = await Cart.create(body)
-        // if(!newCart) {
-        //     return res.status(400)
-        //                .json({
-        //                 ok: false,
-        //                 msg: 'Ha ocurrido un error al crear el producto'
-        //                }) 
-        // }
         const populatedCart = await Cart.findById(newCart._id)
                                   .populate({
                                     path: 'items',
@@ -26,7 +19,7 @@ export const createCart = async (req, res) => {
             msg: 'Carrito creado con éxito'
         })
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({
             ok:false,
             msg: 'Ha habido un error en el servidor'
@@ -44,7 +37,7 @@ export const getCartById = async(req, res) => {
                                             path: "product"
                                         }
                                     })
-        if(!cartFound) {
+        if(!cartFound || cartFound.purchased) {
             return res.status(404)
                       .json({
                         ok: false,
