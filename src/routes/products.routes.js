@@ -94,7 +94,7 @@ route
             validationErrorResponse
         ],
         getProductById
-        )
+    )
     .put(
         "/edit/:id",
         [
@@ -158,7 +158,8 @@ route
                 .withMessage('El valor del campo debe ser un número mayor o igual a 1'),
             validationErrorResponse
         ], 
-        editProductById)
+        editProductById
+    )
     .delete(
         "/delete/:id",
         [
@@ -166,6 +167,6 @@ route
             validationErrorResponse
         ],
         deleteProductById
-        )
+    )
 
 export default route;
