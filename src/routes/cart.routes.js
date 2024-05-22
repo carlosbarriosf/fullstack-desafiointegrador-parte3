@@ -52,10 +52,7 @@ route
                 .withMessage('El formato del campo debe ser del tipo array'),
             body('items.*.quantity')
                 .exists()
-                .withMessage('Este campo es requerido')
-                .bail()
-                .isInt({min: 0})
-                .withMessage('La cantidad mínima es 1'),
+                .withMessage('Este campo es requerido'),
             body('items.*.product')
                 .exists()
                 .withMessage('Este campo es requerido')
