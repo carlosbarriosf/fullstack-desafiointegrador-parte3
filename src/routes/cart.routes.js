@@ -46,16 +46,13 @@ route
         [
             param('id').isMongoId().withMessage('El id del carrito no es válido'),
             body('items')
-                .exists()
-                .withMessage('El carrito no puede estar vacío')
+                .optional()
                 .isArray()
                 .withMessage('El formato del campo debe ser del tipo array'),
             body('items.*.quantity')
-                .exists()
-                .withMessage('Este campo es requerido'),
+                .optional(),
             body('items.*.product')
-                .exists()
-                .withMessage('Este campo es requerido')
+                .optional()
                 .isMongoId()
                 .withMessage('El id proporcionado no es válido'),
             body('purchased')
